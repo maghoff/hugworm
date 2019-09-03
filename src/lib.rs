@@ -1,6 +1,9 @@
+use cgmath::{prelude::*, vec2};
 use wasm_bindgen::prelude::*;
 use wasm_bindgen::JsCast;
 use web_sys::{WebGlProgram, WebGlRenderingContext, WebGlShader};
+
+mod segment;
 
 #[wasm_bindgen(start)]
 pub fn start() -> Result<(), JsValue> {
@@ -35,7 +38,23 @@ pub fn start() -> Result<(), JsValue> {
     let program = link_program(&context, &vert_shader, &frag_shader)?;
     context.use_program(Some(&program));
 
-    let vertices: [f32; 9] = [-0.7, -0.7, 0.0, 0.7, -0.7, 0.0, 0.0, 0.7, 0.0];
+    let mut vertices = vec![];
+
+    let line = segment::Segment::Line {
+        start: vec2(-0.7, 0.),
+        dir: vec2(2., 1.).normalize(),
+        len: 1.4,
+    };
+    line.generate_geometry(&mut vertices);
+
+    let arc = segment::Segment::Arc {
+        center: vec2(0.5, 0.),
+        r: 0.3,
+        dir: 1.,
+        len: 1.4,
+        start_ang: 0.,
+    };
+    arc.generate_geometry(&mut vertices);
 
     let buffer = context.create_buffer().ok_or("failed to create buffer")?;
     context.bind_buffer(WebGlRenderingContext::ARRAY_BUFFER, Some(&buffer));
@@ -51,16 +70,16 @@ pub fn start() -> Result<(), JsValue> {
         );
     }
 
-    context.vertex_attrib_pointer_with_i32(0, 3, WebGlRenderingContext::FLOAT, false, 0, 0);
+    context.vertex_attrib_pointer_with_i32(0, 2, WebGlRenderingContext::FLOAT, false, 0, 0);
     context.enable_vertex_attrib_array(0);
 
     context.clear_color(0.0, 0.0, 0.0, 0.0);
     context.clear(WebGlRenderingContext::COLOR_BUFFER_BIT);
 
     context.draw_arrays(
-        WebGlRenderingContext::TRIANGLES,
+        WebGlRenderingContext::TRIANGLE_STRIP,
         0,
-        (vertices.len() / 3) as i32,
+        (vertices.len() / 2) as i32,
     );
 
     Ok(())
