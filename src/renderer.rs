@@ -13,21 +13,12 @@ fn build_shader_program(context: &WebGlRenderingContext) -> Result<WebGlProgram,
     let vert_shader = webgl::compile_shader(
         &context,
         WebGlRenderingContext::VERTEX_SHADER,
-        r#"
-            attribute vec4 position;
-            void main() {
-                gl_Position = position;
-            }
-        "#,
+        include_str!("vertex.v.glsl"),
     )?;
     let frag_shader = webgl::compile_shader(
         &context,
         WebGlRenderingContext::FRAGMENT_SHADER,
-        r#"
-            void main() {
-                gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0);
-            }
-        "#,
+        include_str!("frag.f.glsl"),
     )?;
     let program = webgl::link_program(&context, &vert_shader, &frag_shader)?;
 
