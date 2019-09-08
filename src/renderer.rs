@@ -1,8 +1,8 @@
+use crate::segment;
+use crate::webgl;
 use cgmath::{prelude::*, vec2};
 use wasm_bindgen::prelude::*;
 use web_sys::{WebGlProgram, WebGlRenderingContext};
-use crate::webgl;
-use crate::segment;
 
 pub struct Renderer<'a> {
     context: &'a WebGlRenderingContext,
@@ -63,8 +63,12 @@ impl<'a> Renderer<'a> {
         };
         arc.generate_geometry(&mut vertices);
 
-        let buffer = self.context.create_buffer().ok_or("failed to create buffer")?;
-        self.context.bind_buffer(WebGlRenderingContext::ARRAY_BUFFER, Some(&buffer));
+        let buffer = self
+            .context
+            .create_buffer()
+            .ok_or("failed to create buffer")?;
+        self.context
+            .bind_buffer(WebGlRenderingContext::ARRAY_BUFFER, Some(&buffer));
 
         unsafe {
             // Safe, because we're not allocating memory until view is out of scope
@@ -77,7 +81,14 @@ impl<'a> Renderer<'a> {
             );
         }
 
-        self.context.vertex_attrib_pointer_with_i32(0, 2, WebGlRenderingContext::FLOAT, false, 0, 0);
+        self.context.vertex_attrib_pointer_with_i32(
+            0,
+            2,
+            WebGlRenderingContext::FLOAT,
+            false,
+            0,
+            0,
+        );
         self.context.enable_vertex_attrib_array(0);
 
         self.context.clear_color(0.0, 0.0, 0.0, 0.0);
