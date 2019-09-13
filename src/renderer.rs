@@ -41,18 +41,25 @@ impl<'a> Renderer<'a> {
         let line = segment::Segment::Line {
             start: vec2(-0.7, 0.),
             dir: vec2(2., 1.).normalize(),
-            len: 1.4,
+            len: 0.4,
         };
         line.generate_geometry(&mut vertices);
 
-        let arc = segment::Segment::Arc {
-            center: vec2(0.5, 0.),
-            r: 0.3,
-            dir: 1.,
-            len: 1.4,
-            start_ang: 0.,
-        };
+        let (start, dir) = line.ending();
+        let arc = segment::arc(start, dir, 0.3, 0.3, true);
         arc.generate_geometry(&mut vertices);
+
+        let (start, dir) = arc.ending();
+        let arc = segment::arc(start, dir, 0.3, 0.6, false);
+        arc.generate_geometry(&mut vertices);
+
+        let (start, dir) = arc.ending();
+        let line = segment::Segment::Line {
+            start: start,
+            dir: dir,
+            len: 0.2,
+        };
+        line.generate_geometry(&mut vertices);
 
         let buffer = self
             .context
