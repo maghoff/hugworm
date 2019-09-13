@@ -50,7 +50,7 @@ impl Segment {
                 let steps = 30;
                 let ir = r - HALF_WIDTH;
                 let or = r + HALF_WIDTH;
-                let ang_step = (end_ang - start_ang) / steps as f32;
+                let ang_step = (end_ang - start_ang) / (steps - 1) as f32;
                 for step in 0..steps {
                     let ang = start_ang + ang_step * step as f32;
 
