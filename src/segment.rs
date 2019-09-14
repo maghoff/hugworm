@@ -8,6 +8,7 @@ pub enum Segment {
         start: Vector2<f32>,
         dir: Vector2<f32>,
         len: f32,
+        reach: f32,
     },
     Arc {
         center: Vector2<f32>,
@@ -15,13 +16,14 @@ pub enum Segment {
         dir: f32,
         len: f32,
         start_ang: f32,
+        reach: f32,
     },
 }
 
 impl Segment {
     pub fn generate_geometry(&self, dest: &mut Vec<f32>) {
         match self {
-            Segment::Line { start, dir, len } => {
+            Segment::Line { start, dir, len, reach } => {
                 let end = start + dir * *len;
                 let side = vec2(-dir.y, dir.x);
                 let left = side * HALF_WIDTH;
@@ -29,22 +31,22 @@ impl Segment {
                 dest.push(start.x + left.x);
                 dest.push(start.y + left.y);
                 dest.push(0.0);
-                dest.push(0.0);
+                dest.push(*reach);
 
                 dest.push(start.x - left.x);
                 dest.push(start.y - left.y);
                 dest.push(1.0);
-                dest.push(0.0);
+                dest.push(*reach);
 
                 dest.push(end.x + left.x);
                 dest.push(end.y + left.y);
                 dest.push(0.0);
-                dest.push(*len);
+                dest.push(*len + *reach);
 
                 dest.push(end.x - left.x);
                 dest.push(end.y - left.y);
                 dest.push(1.0);
-                dest.push(*len);
+                dest.push(*len + *reach);
             }
             Segment::Arc {
                 center,
@@ -52,6 +54,7 @@ impl Segment {
                 dir,
                 len,
                 start_ang,
+                reach,
             } => {
                 let end_ang = start_ang + dir * len / r;
 
@@ -66,25 +69,25 @@ impl Segment {
                     dest.push(center.x + left_r * ang.cos());
                     dest.push(center.y + left_r * ang.sin());
                     dest.push(0.0);
-                    dest.push(len_step * step as f32);
+                    dest.push(*reach + len_step * step as f32);
 
                     dest.push(center.x + right_r * ang.cos());
                     dest.push(center.y + right_r * ang.sin());
                     dest.push(1.0);
-                    dest.push(len_step * step as f32);
+                    dest.push(*reach + len_step * step as f32);
 
                 }
             }
         }
     }
 
-    // return the position and normalized direction of the ending
-    pub fn ending(&self) -> (Vector2<f32>, Vector2<f32>) {
+    // return the position, normalized direction and total reach of the ending
+    pub fn ending(&self) -> (Vector2<f32>, Vector2<f32>, f32) {
         match self {
-            Segment::Line { start, dir, len } => {
+            Segment::Line { start, dir, len, reach } => {
                 let end = start + dir * *len;
 
-                (end, *dir)
+                (end, *dir, reach + len)
             }
             Segment::Arc {
                 center,
@@ -92,20 +95,21 @@ impl Segment {
                 dir,
                 len,
                 start_ang,
+                reach,
             } => {
                 let end_ang = start_ang + dir * len / r;
                 let end_norm = vec2(end_ang.cos(), end_ang.sin());
                 let end = center + *r * end_norm;
                 let end_dir = *dir * vec2(-end_norm.y, end_norm.x);
 
-                (end, end_dir)
+                (end, end_dir, reach + len)
             }
         }
     }
 }
 
 // create an arc with a starting point and normalized direction vector
-pub fn arc(start: Vector2<f32>, dir: Vector2<f32>, r: f32, len: f32, clockwise: bool) -> Segment {
+pub fn arc(start: Vector2<f32>, dir: Vector2<f32>, r: f32, len: f32, clockwise: bool, reach: f32) -> Segment {
     let normal_dir = vec2(-dir.y, dir.x);
     let dir_sign = if clockwise { -1.0 } else { 1.0 };
     let center = start + r * normal_dir * dir_sign;
@@ -115,5 +119,6 @@ pub fn arc(start: Vector2<f32>, dir: Vector2<f32>, r: f32, len: f32, clockwise: 
         dir: dir_sign,
         len: len,
         start_ang: vec2(1.0, 0.0).angle((-dir_sign) * normal_dir).0,
+        reach: reach,
     }
 }
