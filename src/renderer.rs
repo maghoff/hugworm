@@ -61,6 +61,15 @@ impl<'a> Renderer<'a> {
         };
         line.generate_geometry(&mut vertices);
 
+        // ending
+        let (start, dir) = line.ending();
+        let line = segment::Segment::Line {
+            start: start,
+            dir: dir,
+            len: 0.0,
+        };
+        line.generate_geometry(&mut vertices);
+
         let buffer = self
             .context
             .create_buffer()
