@@ -24,19 +24,19 @@ impl Segment {
             Segment::Line { start, dir, len } => {
                 let end = start + dir * *len;
                 let side = vec2(-dir.y, dir.x);
-                let hw = side * HALF_WIDTH;
+                let left = side * HALF_WIDTH;
 
-                dest.push(start.x + hw.x);
-                dest.push(start.y + hw.y);
+                dest.push(start.x + left.x);
+                dest.push(start.y + left.y);
 
-                dest.push(start.x - hw.x);
-                dest.push(start.y - hw.y);
+                dest.push(start.x - left.x);
+                dest.push(start.y - left.y);
 
-                dest.push(end.x + hw.x);
-                dest.push(end.y + hw.y);
+                dest.push(end.x + left.x);
+                dest.push(end.y + left.y);
 
-                dest.push(end.x - hw.x);
-                dest.push(end.y - hw.y);
+                dest.push(end.x - left.x);
+                dest.push(end.y - left.y);
             }
             Segment::Arc {
                 center,
@@ -48,17 +48,17 @@ impl Segment {
                 let end_ang = start_ang + dir * len / r;
 
                 let steps = 30;
-                let ir = r - HALF_WIDTH;
-                let or = r + HALF_WIDTH;
+                let left_r = r - HALF_WIDTH * (*dir as f32);
+                let right_r = r + HALF_WIDTH * (*dir as f32);
                 let ang_step = (end_ang - start_ang) / (steps - 1) as f32;
                 for step in 0..steps {
                     let ang = start_ang + ang_step * step as f32;
 
-                    dest.push(center.x + ir * ang.cos());
-                    dest.push(center.y + ir * ang.sin());
+                    dest.push(center.x + left_r * ang.cos());
+                    dest.push(center.y + left_r * ang.sin());
 
-                    dest.push(center.x + or * ang.cos());
-                    dest.push(center.y + or * ang.sin());
+                    dest.push(center.x + right_r * ang.cos());
+                    dest.push(center.y + right_r * ang.sin());
                 }
             }
         }
