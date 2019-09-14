@@ -81,7 +81,7 @@ impl<'a> Renderer<'a> {
 
         self.context.vertex_attrib_pointer_with_i32(
             0,
-            2,
+            4,
             WebGlRenderingContext::FLOAT,
             false,
             0,
@@ -95,7 +95,7 @@ impl<'a> Renderer<'a> {
         self.context.draw_arrays(
             WebGlRenderingContext::TRIANGLE_STRIP,
             0,
-            (vertices.len() / 2) as i32,
+            (vertices.len() / 4) as i32,
         );
 
         Ok(())

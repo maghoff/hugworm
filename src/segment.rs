@@ -28,15 +28,23 @@ impl Segment {
 
                 dest.push(start.x + left.x);
                 dest.push(start.y + left.y);
+                dest.push(0.0);
+                dest.push(0.0);
 
                 dest.push(start.x - left.x);
                 dest.push(start.y - left.y);
+                dest.push(1.0);
+                dest.push(0.0);
 
                 dest.push(end.x + left.x);
                 dest.push(end.y + left.y);
+                dest.push(0.0);
+                dest.push(*len);
 
                 dest.push(end.x - left.x);
                 dest.push(end.y - left.y);
+                dest.push(1.0);
+                dest.push(*len);
             }
             Segment::Arc {
                 center,
@@ -51,14 +59,20 @@ impl Segment {
                 let left_r = r - HALF_WIDTH * (*dir as f32);
                 let right_r = r + HALF_WIDTH * (*dir as f32);
                 let ang_step = (end_ang - start_ang) / (steps - 1) as f32;
+                let len_step = len / (steps - 1) as f32;
                 for step in 0..steps {
                     let ang = start_ang + ang_step * step as f32;
 
                     dest.push(center.x + left_r * ang.cos());
                     dest.push(center.y + left_r * ang.sin());
+                    dest.push(0.0);
+                    dest.push(len_step * step as f32);
 
                     dest.push(center.x + right_r * ang.cos());
                     dest.push(center.y + right_r * ang.sin());
+                    dest.push(1.0);
+                    dest.push(len_step * step as f32);
+
                 }
             }
         }
