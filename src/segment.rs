@@ -13,7 +13,7 @@ pub enum Segment {
     Arc {
         center: Vector2<f32>,
         r: f32,
-        dir: f32,
+        ang_dir: f32,
         len: f32,
         start_ang: f32,
         reach: f32,
@@ -51,16 +51,16 @@ impl Segment {
             Segment::Arc {
                 center,
                 r,
-                dir,
+                ang_dir,
                 len,
                 start_ang,
                 reach,
             } => {
-                let end_ang = start_ang + dir * len / r;
+                let end_ang = start_ang + ang_dir * len / r;
 
                 let steps = 30;
-                let left_r = r - HALF_WIDTH * (*dir as f32);
-                let right_r = r + HALF_WIDTH * (*dir as f32);
+                let left_r = r - HALF_WIDTH * (*ang_dir as f32);
+                let right_r = r + HALF_WIDTH * (*ang_dir as f32);
                 let ang_step = (end_ang - start_ang) / (steps - 1) as f32;
                 let len_step = len / (steps - 1) as f32;
                 for step in 0..steps {
@@ -92,15 +92,15 @@ impl Segment {
             Segment::Arc {
                 center,
                 r,
-                dir,
+                ang_dir,
                 len,
                 start_ang,
                 reach,
             } => {
-                let end_ang = start_ang + dir * len / r;
+                let end_ang = start_ang + ang_dir * len / r;
                 let end_norm = vec2(end_ang.cos(), end_ang.sin());
                 let end = center + *r * end_norm;
-                let end_dir = *dir * vec2(-end_norm.y, end_norm.x);
+                let end_dir = *ang_dir * vec2(-end_norm.y, end_norm.x);
 
                 (end, end_dir, reach + len)
             }
@@ -111,14 +111,14 @@ impl Segment {
 // create an arc with a starting point and normalized direction vector
 pub fn arc(start: Vector2<f32>, dir: Vector2<f32>, r: f32, len: f32, clockwise: bool, reach: f32) -> Segment {
     let normal_dir = vec2(-dir.y, dir.x);
-    let dir_sign = if clockwise { -1.0 } else { 1.0 };
-    let center = start + r * normal_dir * dir_sign;
+    let ang_dir = if clockwise { -1.0 } else { 1.0 };
+    let center = start + r * normal_dir * ang_dir;
     Segment::Arc {
         center: center,
         r: r,
-        dir: dir_sign,
+        ang_dir,
         len: len,
-        start_ang: vec2(1.0, 0.0).angle((-dir_sign) * normal_dir).0,
+        start_ang: vec2(1.0, 0.0).angle((-ang_dir) * normal_dir).0,
         reach: reach,
     }
 }
