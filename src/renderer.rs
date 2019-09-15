@@ -1,4 +1,4 @@
-use crate::segment;
+use crate::sequence::{Sequence, Turn};
 use crate::webgl;
 use cgmath::{prelude::*, vec2};
 use wasm_bindgen::prelude::*;
@@ -36,40 +36,25 @@ impl<'a> Renderer<'a> {
     pub fn render_scene(&self) -> Result<(), JsValue> {
         self.context.use_program(Some(&self.program));
 
+        let mut sequence = Sequence::new(vec2(-0.7, 0.), vec2(2., 1.).normalize(), Turn::Straight);
+        sequence.head_forward(0.4);
+        sequence.turn_to(Turn::Right { radius: 0.3 });
+        sequence.head_forward(0.3);
+        sequence.turn_to(Turn::Left { radius: 0.3 });
+        sequence.head_forward(0.6);
+        sequence.turn_to(Turn::Straight);
+        sequence.head_forward(0.2);
+
         let mut vertices = vec![];
-
-        let line = segment::Segment::Line {
-            start: vec2(-0.7, 0.),
-            dir: vec2(2., 1.).normalize(),
-            len: 0.4,
-            reach: 0.0,
-        };
-        line.generate_geometry(&mut vertices);
-
-        let (start, dir, reach) = line.ending();
-        let arc = segment::arc(start, dir, 0.3, 0.3, true, reach);
-        arc.generate_geometry(&mut vertices);
-
-        let (start, dir, reach) = arc.ending();
-        let arc = segment::arc(start, dir, 0.3, 0.6, false, reach);
-        arc.generate_geometry(&mut vertices);
-
-        let (start, dir, reach) = arc.ending();
-        let line = segment::Segment::Line {
-            start: start,
-            dir: dir,
-            len: 0.2,
-            reach: reach,
-        };
-        line.generate_geometry(&mut vertices);
+        sequence.generate_geometry(&mut vertices);
 
         // ending
-        let (start, dir, reach) = line.ending();
-        let line = segment::Segment::Line {
-            start: start,
-            dir: dir,
+        let (start, dir, reach) = sequence.ending();
+        let line = crate::segment::Segment::Line {
+            start,
+            dir,
             len: 0.0,
-            reach: reach,
+            reach,
         };
         line.generate_geometry(&mut vertices);
 

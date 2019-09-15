@@ -1,4 +1,4 @@
-use cgmath::{vec2, Vector2, InnerSpace};
+use cgmath::{vec2, Vector2};
 
 const WIDTH: f32 = 0.1;
 const HALF_WIDTH: f32 = WIDTH / 2.0;
@@ -23,7 +23,13 @@ pub enum Segment {
 impl Segment {
     pub fn generate_geometry(&self, dest: &mut Vec<f32>) {
         match self {
-            Segment::Line { start, dir, reach, len: _ } => {
+            Segment::Line {
+                start,
+                dir,
+                len,
+                reach,
+            } => {
+                let end = start + dir * *len;
                 let side = vec2(-dir.y, dir.x);
                 let left = side * HALF_WIDTH;
 
@@ -64,7 +70,6 @@ impl Segment {
                     dest.push(center.y + right_r * ang.sin());
                     dest.push(1.0);
                     dest.push(*reach + len_step * step as f32);
-
                 }
             }
         }
@@ -73,7 +78,12 @@ impl Segment {
     // return the position, normalized direction and total reach of the ending
     pub fn ending(&self) -> (Vector2<f32>, Vector2<f32>, f32) {
         match self {
-            Segment::Line { start, dir, len, reach } => {
+            Segment::Line {
+                start,
+                dir,
+                len,
+                reach,
+            } => {
                 let end = start + dir * *len;
 
                 (end, *dir, reach + len)
@@ -95,19 +105,15 @@ impl Segment {
             }
         }
     }
-}
 
-// create an arc with a starting point and normalized direction vector
-pub fn arc(start: Vector2<f32>, dir: Vector2<f32>, r: f32, len: f32, clockwise: bool, reach: f32) -> Segment {
-    let normal_dir = vec2(-dir.y, dir.x);
-    let ang_dir = if clockwise { -1.0 } else { 1.0 };
-    let center = start + r * normal_dir * ang_dir;
-    Segment::Arc {
-        center: center,
-        r: r,
-        ang_dir,
-        len: len,
-        start_ang: vec2(1.0, 0.0).angle((-ang_dir) * normal_dir).0,
-        reach: reach,
+    pub fn head_forward(&mut self, add_len: f32) {
+        match self {
+            Segment::Line { len, .. } => {
+                *len += add_len;
+            }
+            Segment::Arc { len, .. } => {
+                *len += add_len;
+            }
+        }
     }
 }

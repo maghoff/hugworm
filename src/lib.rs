@@ -2,6 +2,7 @@ use wasm_bindgen::prelude::*;
 
 mod renderer;
 mod segment;
+mod sequence;
 mod webgl;
 
 #[wasm_bindgen(start)]
