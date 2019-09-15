@@ -42,31 +42,34 @@ impl<'a> Renderer<'a> {
             start: vec2(-0.7, 0.),
             dir: vec2(2., 1.).normalize(),
             len: 0.4,
+            reach: 0.0,
         };
         line.generate_geometry(&mut vertices);
 
-        let (start, dir) = line.ending();
-        let arc = segment::arc(start, dir, 0.3, 0.3, true);
+        let (start, dir, reach) = line.ending();
+        let arc = segment::arc(start, dir, 0.3, 0.3, true, reach);
         arc.generate_geometry(&mut vertices);
 
-        let (start, dir) = arc.ending();
-        let arc = segment::arc(start, dir, 0.3, 0.6, false);
+        let (start, dir, reach) = arc.ending();
+        let arc = segment::arc(start, dir, 0.3, 0.6, false, reach);
         arc.generate_geometry(&mut vertices);
 
-        let (start, dir) = arc.ending();
+        let (start, dir, reach) = arc.ending();
         let line = segment::Segment::Line {
             start: start,
             dir: dir,
             len: 0.2,
+            reach: reach,
         };
         line.generate_geometry(&mut vertices);
 
         // ending
-        let (start, dir) = line.ending();
+        let (start, dir, reach) = line.ending();
         let line = segment::Segment::Line {
             start: start,
             dir: dir,
             len: 0.0,
+            reach: reach,
         };
         line.generate_geometry(&mut vertices);
 
@@ -90,7 +93,7 @@ impl<'a> Renderer<'a> {
 
         self.context.vertex_attrib_pointer_with_i32(
             0,
-            2,
+            4,
             WebGlRenderingContext::FLOAT,
             false,
             0,
@@ -104,7 +107,7 @@ impl<'a> Renderer<'a> {
         self.context.draw_arrays(
             WebGlRenderingContext::TRIANGLE_STRIP,
             0,
-            (vertices.len() / 2) as i32,
+            (vertices.len() / 4) as i32,
         );
 
         Ok(())
