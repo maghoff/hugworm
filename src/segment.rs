@@ -23,8 +23,7 @@ pub enum Segment {
 impl Segment {
     pub fn generate_geometry(&self, dest: &mut Vec<f32>) {
         match self {
-            Segment::Line { start, dir, len, reach } => {
-                let end = start + dir * *len;
+            Segment::Line { start, dir, reach, len: _ } => {
                 let side = vec2(-dir.y, dir.x);
                 let left = side * HALF_WIDTH;
 
@@ -37,16 +36,6 @@ impl Segment {
                 dest.push(start.y - left.y);
                 dest.push(1.0);
                 dest.push(*reach);
-
-                dest.push(end.x + left.x);
-                dest.push(end.y + left.y);
-                dest.push(0.0);
-                dest.push(*len + *reach);
-
-                dest.push(end.x - left.x);
-                dest.push(end.y - left.y);
-                dest.push(1.0);
-                dest.push(*len + *reach);
             }
             Segment::Arc {
                 center,
@@ -61,8 +50,8 @@ impl Segment {
                 let steps = 30;
                 let left_r = r - HALF_WIDTH * (*ang_dir as f32);
                 let right_r = r + HALF_WIDTH * (*ang_dir as f32);
-                let ang_step = (end_ang - start_ang) / (steps - 1) as f32;
-                let len_step = len / (steps - 1) as f32;
+                let ang_step = (end_ang - start_ang) / steps as f32;
+                let len_step = len / steps as f32;
                 for step in 0..steps {
                     let ang = start_ang + ang_step * step as f32;
 
