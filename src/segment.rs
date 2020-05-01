@@ -24,12 +24,8 @@ impl Segment {
     pub fn generate_geometry(&self, dest: &mut Vec<f32>) {
         match self {
             Segment::Line {
-                start,
-                dir,
-                len,
-                reach,
+                start, dir, reach, ..
             } => {
-                let end = start + dir * *len;
                 let side = vec2(-dir.y, dir.x);
                 let left = side * HALF_WIDTH;
 
