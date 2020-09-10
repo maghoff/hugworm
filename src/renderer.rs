@@ -86,7 +86,7 @@ impl<'a> Renderer<'a> {
         );
         self.context.enable_vertex_attrib_array(0);
 
-        self.context.clear_color(0.0, 0.0, 0.0, 0.0);
+        self.context.clear_color(1.0, 1.0, 1.0, 1.0);
         self.context.clear(WebGlRenderingContext::COLOR_BUFFER_BIT);
 
         self.context.draw_arrays(
