@@ -1,5 +1,6 @@
 use crate::segment::Segment;
 use cgmath::{prelude::*, vec2, Vector2};
+use std::collections::VecDeque;
 
 pub enum Turn {
     Left { radius: f32 },
@@ -8,7 +9,7 @@ pub enum Turn {
 }
 
 pub struct Sequence {
-    segments: Vec<Segment>,
+    segments: VecDeque<Segment>,
 }
 
 // create an arc with a starting point and normalized direction vector
@@ -45,18 +46,29 @@ impl Sequence {
                     reach: 0.,
                 },
                 Turn::Right { radius } => arc(pos, dir, radius, 0., true, 0.),
-            }],
+            }]
+            .into(),
         }
     }
 
     pub fn head_forward(&mut self, len: f32) {
-        self.segments.last_mut().unwrap().head_forward(len);
+        self.segments.back_mut().unwrap().head_forward(len);
+    }
+
+    pub fn tail_forward(&mut self, len: f32) {
+        match self.segments.front_mut().unwrap().tail_forward(len) {
+            Some(remainder) => {
+                self.segments.pop_front();
+                self.tail_forward(remainder);
+            }
+            None => (),
+        }
     }
 
     pub fn turn_to(&mut self, turn: Turn) {
-        let (pos, dir, reach) = self.segments.last().unwrap().ending();
+        let (pos, dir, reach) = self.segments.back().unwrap().ending();
 
-        self.segments.push(match turn {
+        self.segments.push_back(match turn {
             Turn::Left { radius } => arc(pos, dir, radius, 0., false, reach),
             Turn::Straight => Segment::Line {
                 start: pos,
@@ -75,6 +87,6 @@ impl Sequence {
     }
 
     pub fn ending(&self) -> (Vector2<f32>, Vector2<f32>, f32) {
-        self.segments.last().unwrap().ending()
+        self.segments.back().unwrap().ending()
     }
 }

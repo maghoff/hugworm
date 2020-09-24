@@ -112,4 +112,42 @@ impl Segment {
             }
         }
     }
+
+    pub fn tail_forward(&mut self, sub_len: f32) -> Option<f32> {
+        match self {
+            Segment::Line {
+                start,
+                dir,
+                len,
+                reach,
+                ..
+            } => {
+                if sub_len >= *len {
+                    Some(sub_len - *len)
+                } else {
+                    *start += *dir * sub_len;
+                    *len -= sub_len;
+                    *reach += sub_len;
+                    None
+                }
+            }
+            Segment::Arc {
+                r,
+                ang_dir,
+                len,
+                start_ang,
+                reach,
+                ..
+            } => {
+                if sub_len >= *len {
+                    Some(sub_len - *len)
+                } else {
+                    *start_ang += *ang_dir * sub_len / *r;
+                    *len -= sub_len;
+                    *reach += sub_len;
+                    None
+                }
+            }
+        }
+    }
 }
