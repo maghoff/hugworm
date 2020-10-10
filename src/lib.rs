@@ -20,11 +20,15 @@ fn request_animation_frame(f: &Closure<dyn FnMut()>) {
 
 fn init_keyboard(scene: Rc<RefCell<Scene>>) {
     let callback = Closure::wrap(Box::new(move |event: web_sys::KeyboardEvent| {
-        match event.key_code() {
-            37 => scene.borrow_mut().turn_left(),
-            38 => scene.borrow_mut().turn_straight(),
-            39 => scene.borrow_mut().turn_right(),
-            _ => (),
+        let handled = match event.key_code() {
+            37 => { scene.borrow_mut().turn_left(); true }
+            38 => { scene.borrow_mut().turn_straight(); true }
+            39 => { scene.borrow_mut().turn_right(); true }
+            _ => false,
+        };
+
+        if handled {
+            event.prevent_default();
         }
     }) as Box<dyn FnMut(_)>);
 
