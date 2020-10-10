@@ -5,6 +5,7 @@ mod scene;
 mod segment;
 mod sequence;
 mod webgl;
+use crate::scene::Scene;
 use std::cell::RefCell;
 use std::rc::Rc;
 use wasm_bindgen::JsCast;
@@ -17,9 +18,27 @@ fn request_animation_frame(f: &Closure<dyn FnMut()>) {
         .expect("should register `requestAnimationFrame` OK");
 }
 
+fn init_keyboard(scene: Rc<RefCell<Scene>>) {
+    let callback = Closure::wrap(Box::new(move |event: web_sys::KeyboardEvent| {
+        match event.key_code() {
+            37 => scene.borrow_mut().turn_left(),
+            38 => scene.borrow_mut().turn_straight(),
+            39 => scene.borrow_mut().turn_right(),
+            _ => (),
+        }
+    }) as Box<dyn FnMut(_)>);
+
+    let window = web_sys::window().unwrap();
+    window.add_event_listener_with_callback("keydown", callback.as_ref().unchecked_ref()).unwrap();
+
+    callback.forget();
+}
+
 #[wasm_bindgen(start)]
 pub fn start() -> Result<(), JsValue> {
-    let mut scene = scene::Scene::new();
+    let scene = Rc::new(RefCell::new(scene::Scene::new()));
+
+    init_keyboard(scene.clone());
 
     let context = webgl::get_context("canvas")?;
     let renderer = renderer::Renderer::new(context)?;
@@ -28,8 +47,8 @@ pub fn start() -> Result<(), JsValue> {
     let g = f.clone();
 
     *g.borrow_mut() = Some(Closure::wrap(Box::new(move || {
-        scene.update();
-        renderer.render_scene(&scene).unwrap();
+        scene.borrow_mut().update();
+        renderer.render_scene(&scene.borrow()).unwrap();
         request_animation_frame(f.borrow().as_ref().unwrap());
     }) as Box<dyn FnMut()>));
 

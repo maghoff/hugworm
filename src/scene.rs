@@ -20,6 +20,18 @@ impl Scene {
         Scene { worm: sequence }
     }
 
+    pub fn turn_straight(&mut self) {
+        self.worm.turn_to(Turn::Straight);
+    }
+
+    pub fn turn_left(&mut self) {
+        self.worm.turn_to(Turn::Left { radius: 0.3 });
+    }
+
+    pub fn turn_right(&mut self) {
+        self.worm.turn_to(Turn::Right { radius: 0.3 });
+    }
+
     pub fn update(&mut self) {
         const SPEED: f32 = 0.02;
         self.worm.head_forward(SPEED);
