@@ -8,7 +8,6 @@ pub enum Segment {
         start: Vector2<f32>,
         dir: Vector2<f32>,
         len: f32,
-        reach: f32,
     },
     Arc {
         center: Vector2<f32>,
@@ -16,15 +15,14 @@ pub enum Segment {
         ang_dir: f32,
         len: f32,
         start_ang: f32,
-        reach: f32,
     },
 }
 
 impl Segment {
-    pub fn generate_geometry(&self, dest: &mut Vec<f32>) {
+    pub fn generate_geometry(&self, dest: &mut Vec<f32>, start_reach: f32) {
         match self {
             Segment::Line {
-                start, dir, reach, ..
+                start, dir, ..
             } => {
                 let side = vec2(-dir.y, dir.x);
                 let left = side * HALF_WIDTH;
@@ -32,12 +30,12 @@ impl Segment {
                 dest.push(start.x + left.x);
                 dest.push(start.y + left.y);
                 dest.push(0.0);
-                dest.push(*reach);
+                dest.push(start_reach);
 
                 dest.push(start.x - left.x);
                 dest.push(start.y - left.y);
                 dest.push(1.0);
-                dest.push(*reach);
+                dest.push(start_reach);
             }
             Segment::Arc {
                 center,
@@ -45,7 +43,6 @@ impl Segment {
                 ang_dir,
                 len,
                 start_ang,
-                reach,
             } => {
                 let end_ang = start_ang + ang_dir * len / r;
 
@@ -60,29 +57,35 @@ impl Segment {
                     dest.push(center.x + left_r * ang.cos());
                     dest.push(center.y + left_r * ang.sin());
                     dest.push(0.0);
-                    dest.push(*reach + len_step * step as f32);
+                    dest.push(start_reach + len_step * step as f32);
 
                     dest.push(center.x + right_r * ang.cos());
                     dest.push(center.y + right_r * ang.sin());
                     dest.push(1.0);
-                    dest.push(*reach + len_step * step as f32);
+                    dest.push(start_reach + len_step * step as f32);
                 }
             }
         }
     }
 
-    // return the position, normalized direction and total reach of the ending
-    pub fn ending(&self) -> (Vector2<f32>, Vector2<f32>, f32) {
+    pub fn len(&self) -> f32 {
+        match self {
+            Segment::Line { len, .. } => *len,
+            Segment::Arc { len, .. } => *len,
+        }
+    }
+
+    // return the position and direction of the ending
+    pub fn ending(&self) -> (Vector2<f32>, Vector2<f32>) {
         match self {
             Segment::Line {
                 start,
                 dir,
                 len,
-                reach,
             } => {
                 let end = start + dir * *len;
 
-                (end, *dir, reach + len)
+                (end, *dir)
             }
             Segment::Arc {
                 center,
@@ -90,14 +93,13 @@ impl Segment {
                 ang_dir,
                 len,
                 start_ang,
-                reach,
             } => {
                 let end_ang = start_ang + ang_dir * len / r;
                 let end_norm = vec2(end_ang.cos(), end_ang.sin());
                 let end = center + *r * end_norm;
                 let end_dir = *ang_dir * vec2(-end_norm.y, end_norm.x);
 
-                (end, end_dir, reach + len)
+                (end, end_dir)
             }
         }
     }
@@ -119,7 +121,6 @@ impl Segment {
                 start,
                 dir,
                 len,
-                reach,
                 ..
             } => {
                 if sub_len >= *len {
@@ -127,7 +128,6 @@ impl Segment {
                 } else {
                     *start += *dir * sub_len;
                     *len -= sub_len;
-                    *reach += sub_len;
                     None
                 }
             }
@@ -136,7 +136,6 @@ impl Segment {
                 ang_dir,
                 len,
                 start_ang,
-                reach,
                 ..
             } => {
                 if sub_len >= *len {
@@ -144,7 +143,6 @@ impl Segment {
                 } else {
                     *start_ang += *ang_dir * sub_len / *r;
                     *len -= sub_len;
-                    *reach += sub_len;
                     None
                 }
             }

@@ -48,16 +48,6 @@ impl<'a> Renderer<'a> {
         let mut vertices = vec![];
         sequence.generate_geometry(&mut vertices);
 
-        // ending
-        let (start, dir, reach) = sequence.ending();
-        let line = crate::segment::Segment::Line {
-            start,
-            dir,
-            len: 0.0,
-            reach,
-        };
-        line.generate_geometry(&mut vertices);
-
         let buffer = self
             .context
             .create_buffer()
