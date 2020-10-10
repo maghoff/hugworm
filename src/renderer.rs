@@ -4,8 +4,8 @@ use cgmath::{prelude::*, vec2};
 use wasm_bindgen::prelude::*;
 use web_sys::{WebGlProgram, WebGlRenderingContext};
 
-pub struct Renderer<'a> {
-    context: &'a WebGlRenderingContext,
+pub struct Renderer {
+    context: WebGlRenderingContext,
     program: WebGlProgram,
 }
 
@@ -25,11 +25,12 @@ fn build_shader_program(context: &WebGlRenderingContext) -> Result<WebGlProgram,
     Ok(program)
 }
 
-impl<'a> Renderer<'a> {
-    pub fn new(context: &WebGlRenderingContext) -> Result<Renderer, JsValue> {
+impl Renderer {
+    pub fn new(context: WebGlRenderingContext) -> Result<Renderer, JsValue> {
+        let program = build_shader_program(&context)?;
         Ok(Renderer {
             context,
-            program: build_shader_program(context)?,
+            program,
         })
     }
 
