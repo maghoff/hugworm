@@ -1,6 +1,5 @@
-use crate::sequence::{Sequence, Turn};
+use crate::scene::Scene;
 use crate::webgl;
-use cgmath::{prelude::*, vec2};
 use wasm_bindgen::prelude::*;
 use web_sys::{WebGlProgram, WebGlRenderingContext};
 
@@ -28,26 +27,11 @@ fn build_shader_program(context: &WebGlRenderingContext) -> Result<WebGlProgram,
 impl Renderer {
     pub fn new(context: WebGlRenderingContext) -> Result<Renderer, JsValue> {
         let program = build_shader_program(&context)?;
-        Ok(Renderer {
-            context,
-            program,
-        })
+        Ok(Renderer { context, program })
     }
 
-    pub fn render_scene(&self) -> Result<(), JsValue> {
+    pub fn render_scene(&self, scene: &Scene) -> Result<(), JsValue> {
         self.context.use_program(Some(&self.program));
-
-        let mut sequence = Sequence::new(vec2(-0.7, 0.), vec2(2., 1.).normalize(), Turn::Straight);
-        sequence.head_forward(0.4);
-        sequence.turn_to(Turn::Right { radius: 0.3 });
-        sequence.head_forward(0.3);
-        sequence.turn_to(Turn::Left { radius: 0.3 });
-        sequence.head_forward(0.6);
-        sequence.turn_to(Turn::Straight);
-        sequence.head_forward(0.2);
-
-        let mut vertices = vec![];
-        sequence.generate_geometry(&mut vertices);
 
         let buffer = self
             .context
@@ -55,6 +39,9 @@ impl Renderer {
             .ok_or("failed to create buffer")?;
         self.context
             .bind_buffer(WebGlRenderingContext::ARRAY_BUFFER, Some(&buffer));
+
+        let mut vertices = vec![];
+        scene.worm.generate_geometry(&mut vertices);
 
         unsafe {
             // Safe, because we're not allocating memory until view is out of scope
