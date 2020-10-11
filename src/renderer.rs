@@ -31,6 +31,12 @@ impl Renderer {
     }
 
     pub fn render_scene(&self, scene: &Scene) -> Result<(), JsValue> {
+        self.context.enable(WebGlRenderingContext::BLEND);
+        self.context.blend_func(
+            WebGlRenderingContext::SRC_ALPHA,
+            WebGlRenderingContext::ONE_MINUS_SRC_ALPHA,
+        );
+
         self.context.use_program(Some(&self.program));
 
         let buffer = self
