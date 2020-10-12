@@ -19,23 +19,32 @@ fn request_animation_frame(f: &Closure<dyn FnMut()>) {
 }
 
 fn init_keyboard(scene: Rc<RefCell<Scene>>) {
-    let callback = Closure::wrap(Box::new(move |event: web_sys::KeyboardEvent| {
-        let handled = match event.key_code() {
-            37 => { scene.borrow_mut().turn_left(); true }
-            38 => { scene.borrow_mut().turn_straight(); true }
-            39 => { scene.borrow_mut().turn_right(); true }
-            _ => false,
-        };
+    let keyup = {
+        let scene = scene.clone();
+        Closure::wrap(Box::new(move |event: web_sys::KeyboardEvent| {
+            let handled = scene.borrow_mut().key_event(event.key_code(), false);
+            if handled {
+                event.prevent_default();
+            }
+        }) as Box<dyn FnMut(_)>)
+    };
 
-        if handled {
-            event.prevent_default();
-        }
-    }) as Box<dyn FnMut(_)>);
+    let keydown = {
+        let scene = scene.clone();
+        Closure::wrap(Box::new(move |event: web_sys::KeyboardEvent| {
+            let handled = scene.borrow_mut().key_event(event.key_code(), true);
+            if handled {
+                event.prevent_default();
+            }
+        }) as Box<dyn FnMut(_)>)
+    };
 
     let window = web_sys::window().unwrap();
-    window.add_event_listener_with_callback("keydown", callback.as_ref().unchecked_ref()).unwrap();
+    window.add_event_listener_with_callback("keyup", keyup.as_ref().unchecked_ref()).unwrap();
+    window.add_event_listener_with_callback("keydown", keydown.as_ref().unchecked_ref()).unwrap();
 
-    callback.forget();
+    keyup.forget();
+    keydown.forget();
 }
 
 #[wasm_bindgen(start)]
