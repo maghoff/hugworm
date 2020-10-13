@@ -3,10 +3,14 @@ use crate::turn::Turn;
 use cgmath::{prelude::*, vec2};
 
 const KEY_LEFT : u32 = 37;
+const KEY_UP : u32 = 38;
 const KEY_RIGHT : u32 = 39;
+const KEY_DOWN : u32 = 40;
 
 pub struct Scene {
     pub worm: Sequence,
+    press_up: bool,
+    press_down: bool,
     press_left: bool,
     press_right: bool,
 }
@@ -21,6 +25,8 @@ impl Scene {
 
         Scene {
             worm: sequence,
+            press_up: false,
+            press_down: false,
             press_left: false,
             press_right: false,
         }
@@ -28,6 +34,8 @@ impl Scene {
 
     pub fn key_event(&mut self, code: u32, depressed: bool) -> bool {
         let handled = match code {
+            KEY_UP => { self.press_up = depressed; true }
+            KEY_DOWN => { self.press_down = depressed; true }
             KEY_LEFT => { self.press_left = depressed; true }
             KEY_RIGHT => { self.press_right = depressed; true }
             _ => false,
@@ -46,7 +54,11 @@ impl Scene {
             _ => Turn::Straight,
         };
 
-        self.worm.head_forward(SPEED, turn);
-        self.worm.tail_forward(SPEED);
+        if !self.press_down {
+            self.worm.head_forward(SPEED, turn);
+        }
+        if !self.press_up {
+            self.worm.tail_forward(SPEED);
+        }
     }
 }
