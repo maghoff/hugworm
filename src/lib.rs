@@ -4,6 +4,7 @@ mod renderer;
 mod scene;
 mod segment;
 mod sequence;
+mod turn;
 mod webgl;
 use crate::scene::Scene;
 use std::cell::RefCell;

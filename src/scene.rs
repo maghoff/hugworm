@@ -1,4 +1,5 @@
-use crate::sequence::{Sequence, Turn};
+use crate::sequence::Sequence;
+use crate::turn::Turn;
 use cgmath::{prelude::*, vec2};
 
 const KEY_LEFT : u32 = 37;
@@ -8,27 +9,20 @@ pub struct Scene {
     pub worm: Sequence,
     press_left: bool,
     press_right: bool,
-    last_turn: Turn,
 }
 
 impl Scene {
     pub fn new() -> Scene {
         let mut sequence = Sequence::new(vec2(-0.7, 0.), vec2(2., 1.).normalize(), Turn::Straight);
-        sequence.head_forward(0.4);
-        sequence.turn_to(Turn::Right { radius: 0.3 });
-        sequence.head_forward(0.3);
-        sequence.turn_to(Turn::Left { radius: 0.3 });
-        sequence.head_forward(0.6);
-        sequence.turn_to(Turn::Straight);
-        sequence.head_forward(0.2);
-        let last_turn = Turn::Left { radius: 0.3 };
-        sequence.turn_to(last_turn);
+        sequence.head_forward(0.4, Turn::Straight);
+        sequence.head_forward(0.3, Turn::Right { radius: 0.3 });
+        sequence.head_forward(0.6, Turn::Left { radius: 0.3 });
+        sequence.head_forward(0.2, Turn::Straight);
 
         Scene {
             worm: sequence,
             press_left: false,
             press_right: false,
-            last_turn,
         }
     }
 
@@ -46,18 +40,13 @@ impl Scene {
         const SPEED: f32 = 0.02;
         const RADIUS: f32 = 0.3;
 
-        let next_turn = match (self.press_left, self.press_right) {
+        let turn = match (self.press_left, self.press_right) {
             (true, false) => Turn::Left { radius: RADIUS },
             (false, true) => Turn::Right { radius: RADIUS },
             _ => Turn::Straight,
         };
 
-        if next_turn != self.last_turn {
-            self.worm.turn_to(next_turn);
-            self.last_turn = next_turn;
-        }
-
-        self.worm.head_forward(SPEED);
+        self.worm.head_forward(SPEED, turn);
         self.worm.tail_forward(SPEED);
     }
 }
