@@ -1,7 +1,6 @@
 use crate::sequence::{Sequence, Turn};
 use cgmath::{prelude::*, vec2};
 
-const RADIUS: f32 = 0.3;
 const KEY_LEFT : u32 = 37;
 const KEY_RIGHT : u32 = 39;
 
@@ -9,7 +8,6 @@ pub struct Scene {
     pub worm: Sequence,
     press_left: bool,
     press_right: bool,
-    next_turn: Turn,
     last_turn: Turn,
 }
 
@@ -31,38 +29,13 @@ impl Scene {
             press_left: false,
             press_right: false,
             last_turn,
-            next_turn: last_turn,
         }
     }
 
     pub fn key_event(&mut self, code: u32, depressed: bool) -> bool {
-        const LEFT : Turn = Turn::Left { radius: RADIUS };
-        const RIGHT : Turn = Turn::Right { radius: RADIUS };
-        const STRAIGHT : Turn = Turn::Straight;
-
         let handled = match code {
-            KEY_LEFT => {
-                self.press_left = depressed;
-
-                self.next_turn = match depressed {
-                    true => LEFT,
-                    false if self.press_right => RIGHT,
-                    _ => STRAIGHT,
-                };
-
-                true
-            }
-            KEY_RIGHT => {
-                self.press_right = depressed;
-
-                self.next_turn = match depressed {
-                    true => RIGHT,
-                    false if self.press_left => LEFT,
-                    _ => STRAIGHT,
-                };
-
-                true
-            }
+            KEY_LEFT => { self.press_left = depressed; true }
+            KEY_RIGHT => { self.press_right = depressed; true }
             _ => false,
         };
 
@@ -71,10 +44,17 @@ impl Scene {
 
     pub fn update(&mut self) {
         const SPEED: f32 = 0.02;
+        const RADIUS: f32 = 0.3;
 
-        if self.next_turn != self.last_turn {
-            self.worm.turn_to(self.next_turn);
-            self.last_turn = self.next_turn;
+        let next_turn = match (self.press_left, self.press_right) {
+            (true, false) => Turn::Left { radius: RADIUS },
+            (false, true) => Turn::Right { radius: RADIUS },
+            _ => Turn::Straight,
+        };
+
+        if next_turn != self.last_turn {
+            self.worm.turn_to(next_turn);
+            self.last_turn = next_turn;
         }
 
         self.worm.head_forward(SPEED);
