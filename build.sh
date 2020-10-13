@@ -10,5 +10,5 @@ wasm-pack build
 ./node_modules/.bin/webpack \
     --mode production \
     --entry ./entry.js \
-    --output-public-path /dist/ \
+    --output-public-path ./dist/ \
     --output-path $PWD/site/dist
