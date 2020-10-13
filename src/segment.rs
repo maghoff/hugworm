@@ -1,4 +1,5 @@
 use cgmath::{vec2, Vector2};
+use crate::turn::Turn;
 
 const WIDTH: f32 = 0.1;
 const HALF_WIDTH: f32 = WIDTH / 2.0;
@@ -144,6 +145,19 @@ impl Segment {
                     *start_ang += *ang_dir * sub_len / *r;
                     *len -= sub_len;
                     None
+                }
+            }
+        }
+    }
+
+    pub fn turn(&self) -> Turn {
+        match *self {
+            Segment::Line { .. } => { Turn::Straight }
+            Segment::Arc { r, ang_dir, ..  } => {
+                if ang_dir < 0.0 {
+                    Turn::Right { radius: r }
+                } else {
+                    Turn::Left { radius: r }
                 }
             }
         }

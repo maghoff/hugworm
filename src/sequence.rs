@@ -1,13 +1,7 @@
 use crate::segment::Segment;
+use crate::turn::Turn;
 use cgmath::{prelude::*, vec2, Vector2};
 use std::collections::VecDeque;
-
-#[derive(PartialEq, Clone, Copy)]
-pub enum Turn {
-    Left { radius: f32 },
-    Straight,
-    Right { radius: f32 },
-}
 
 pub struct Sequence {
     segments: VecDeque<Segment>,
@@ -49,7 +43,11 @@ impl Sequence {
         }
     }
 
-    pub fn head_forward(&mut self, len: f32) {
+    pub fn head_forward(&mut self, len: f32, turn: Turn) {
+        if turn != self.segments.back().unwrap().turn() {
+            self.new_segment(turn);
+        }
+
         self.segments.back_mut().unwrap().head_forward(len);
     }
 
@@ -63,7 +61,7 @@ impl Sequence {
         }
     }
 
-    pub fn turn_to(&mut self, turn: Turn) {
+    fn new_segment(&mut self, turn: Turn) {
         let (pos, dir) = self.segments.back().unwrap().ending();
 
         self.segments.push_back(match turn {
