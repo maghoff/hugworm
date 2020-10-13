@@ -29,23 +29,15 @@ fn arc(
 
 impl Sequence {
     pub fn new(pos: Vector2<f32>, dir: Vector2<f32>, turn: Turn) -> Sequence {
-        Sequence {
-            segments: vec![match turn {
-                Turn::Left { radius } => arc(pos, dir, radius, 0., false),
-                Turn::Straight => Segment::Line {
-                    start: pos,
-                    dir,
-                    len: 0.,
-                },
-                Turn::Right { radius } => arc(pos, dir, radius, 0., true),
-            }]
-            .into(),
-        }
+        let mut sequence = Sequence { segments: Vec::new().into() };
+        sequence.new_segment(pos, dir, turn);
+        sequence
     }
 
     pub fn head_forward(&mut self, len: f32, turn: Turn) {
         if turn != self.segments.back().unwrap().turn() {
-            self.new_segment(turn);
+            let (pos, dir) = self.segments.back().unwrap().ending();
+            self.new_segment(pos, dir, turn);
         }
 
         self.segments.back_mut().unwrap().head_forward(len);
@@ -61,9 +53,7 @@ impl Sequence {
         }
     }
 
-    fn new_segment(&mut self, turn: Turn) {
-        let (pos, dir) = self.segments.back().unwrap().ending();
-
+    fn new_segment(&mut self, pos: Vector2<f32>, dir: Vector2<f32>, turn: Turn) {
         self.segments.push_back(match turn {
             Turn::Left { radius } => arc(pos, dir, radius, 0., false),
             Turn::Straight => Segment::Line {
