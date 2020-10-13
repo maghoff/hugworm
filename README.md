@@ -8,6 +8,6 @@ To run in a browser, you can use `basic-http-server`:
     cargo install basic-http-server
 
     # Start:
-    basic-http-server
+    basic-http-server site
 
-The program is now available at <http://127.0.0.1:4000/site/>.
+The program is now available at <http://127.0.0.1:4000/>.
