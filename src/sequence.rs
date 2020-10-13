@@ -2,6 +2,7 @@ use crate::segment::Segment;
 use cgmath::{prelude::*, vec2, Vector2};
 use std::collections::VecDeque;
 
+#[derive(PartialEq, Clone, Copy)]
 pub enum Turn {
     Left { radius: f32 },
     Straight,
