@@ -4,4 +4,3 @@ pub enum Turn {
     Straight,
     Right { radius: f32 },
 }
-

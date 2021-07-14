@@ -8,13 +8,7 @@ pub struct Sequence {
 }
 
 // create an arc with a starting point and normalized direction vector
-fn arc(
-    start: Vector2<f32>,
-    dir: Vector2<f32>,
-    r: f32,
-    len: f32,
-    clockwise: bool,
-) -> Segment {
+fn arc(start: Vector2<f32>, dir: Vector2<f32>, r: f32, len: f32, clockwise: bool) -> Segment {
     let normal_dir = vec2(-dir.y, dir.x);
     let ang_dir = if clockwise { -1.0 } else { 1.0 };
     let center = start + r * normal_dir * ang_dir;
@@ -29,7 +23,9 @@ fn arc(
 
 impl Sequence {
     pub fn new(pos: Vector2<f32>, dir: Vector2<f32>, turn: Turn) -> Sequence {
-        let mut sequence = Sequence { segments: Vec::new().into() };
+        let mut sequence = Sequence {
+            segments: Vec::new().into(),
+        };
         sequence.new_segment(pos, dir, turn);
         sequence
     }

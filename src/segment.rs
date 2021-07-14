@@ -1,5 +1,5 @@
-use cgmath::{vec2, Vector2};
 use crate::turn::Turn;
+use cgmath::{vec2, Vector2};
 
 const WIDTH: f32 = 0.1;
 const HALF_WIDTH: f32 = WIDTH / 2.0;
@@ -22,9 +22,7 @@ pub enum Segment {
 impl Segment {
     pub fn generate_geometry(&self, dest: &mut Vec<f32>, start_reach: f32) {
         match self {
-            Segment::Line {
-                start, dir, ..
-            } => {
+            Segment::Line { start, dir, .. } => {
                 let side = vec2(-dir.y, dir.x);
                 let left = side * HALF_WIDTH;
 
@@ -79,11 +77,7 @@ impl Segment {
     // return the position and direction of the ending
     pub fn ending(&self) -> (Vector2<f32>, Vector2<f32>) {
         match self {
-            Segment::Line {
-                start,
-                dir,
-                len,
-            } => {
+            Segment::Line { start, dir, len } => {
                 let end = start + dir * *len;
 
                 (end, *dir)
@@ -119,10 +113,7 @@ impl Segment {
     pub fn tail_forward(&mut self, sub_len: f32) -> Option<f32> {
         match self {
             Segment::Line {
-                start,
-                dir,
-                len,
-                ..
+                start, dir, len, ..
             } => {
                 if sub_len >= *len {
                     Some(sub_len - *len)
@@ -152,8 +143,8 @@ impl Segment {
 
     pub fn turn(&self) -> Turn {
         match *self {
-            Segment::Line { .. } => { Turn::Straight }
-            Segment::Arc { r, ang_dir, ..  } => {
+            Segment::Line { .. } => Turn::Straight,
+            Segment::Arc { r, ang_dir, .. } => {
                 if ang_dir < 0.0 {
                     Turn::Right { radius: r }
                 } else {

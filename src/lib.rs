@@ -41,8 +41,12 @@ fn init_keyboard(scene: Rc<RefCell<Scene>>) {
     };
 
     let window = web_sys::window().unwrap();
-    window.add_event_listener_with_callback("keyup", keyup.as_ref().unchecked_ref()).unwrap();
-    window.add_event_listener_with_callback("keydown", keydown.as_ref().unchecked_ref()).unwrap();
+    window
+        .add_event_listener_with_callback("keyup", keyup.as_ref().unchecked_ref())
+        .unwrap();
+    window
+        .add_event_listener_with_callback("keydown", keydown.as_ref().unchecked_ref())
+        .unwrap();
 
     keyup.forget();
     keydown.forget();
