@@ -1,6 +1,8 @@
-Inspect or run `prepare.sh` to get build dependencies.
+Targetting WASM
+===============
+Inspect or run `prepare-wasm.sh` to get build dependencies.
 
-Run `build.sh` to build.
+Run `build-wasm.sh` to build.
 
 To run in a browser, you can use `basic-http-server`:
 
