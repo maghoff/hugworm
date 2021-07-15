@@ -30,3 +30,6 @@ features = [
   'WebGlShader',
   'Window',
 ]
+
+[target.'cfg(not(target_arch = "wasm32"))'.dependencies]
+glium = "0.30.1"
