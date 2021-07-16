@@ -2,6 +2,6 @@
 
 use hugworm::platform_opengl;
 
-fn main() {
+fn main() -> Result<(), Box<dyn std::error::Error>> {
     platform_opengl::main()
 }
