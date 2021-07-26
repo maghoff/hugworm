@@ -4,6 +4,7 @@ use glium::{
         event::{ElementState, Event, KeyboardInput, VirtualKeyCode, WindowEvent},
         event_loop::ControlFlow::{self, Exit},
     },
+    program,
 };
 
 pub fn main() -> Result<(), Box<dyn std::error::Error>> {
