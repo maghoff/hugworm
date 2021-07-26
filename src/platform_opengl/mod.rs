@@ -1,11 +1,14 @@
+mod renderer;
+
 use glium::{
     glutin,
     glutin::{
         event::{ElementState, Event, KeyboardInput, VirtualKeyCode, WindowEvent},
         event_loop::ControlFlow::{self, Exit},
     },
-    program,
 };
+
+use crate::{platform_opengl::renderer::Renderer, scene::Scene};
 
 pub fn main() -> Result<(), Box<dyn std::error::Error>> {
     let event_loop = glutin::event_loop::EventLoop::new();
@@ -14,12 +17,9 @@ pub fn main() -> Result<(), Box<dyn std::error::Error>> {
     let context = glutin::ContextBuilder::new();
     let display = glium::Display::new(window, context, &event_loop)?;
 
-    let program = program!(&display,
-        140 => {
-            vertex: include_str!("vertex.v.glsl"),
-            fragment: include_str!("frag.f.glsl"),
-        },
-    )?;
+    let scene = Scene::new();
+
+    let renderer = Renderer::new(display)?;
 
     event_loop.run(move |event, _target, control_flow| {
         *control_flow = ControlFlow::Wait;
@@ -42,5 +42,7 @@ pub fn main() -> Result<(), Box<dyn std::error::Error>> {
                 _ => (),
             };
         }
+
+        renderer.render_scene(&scene);
     });
 }
