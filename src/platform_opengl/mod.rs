@@ -8,6 +8,13 @@ pub fn main() -> Result<(), Box<dyn std::error::Error>> {
     let context = glutin::ContextBuilder::new();
     let display = glium::Display::new(window, context, &event_loop)?;
 
+    let program = program!(&display,
+        140 => {
+            vertex: include_str!("vertex.v.glsl"),
+            fragment: include_str!("frag.f.glsl"),
+        },
+    )?;
+
     event_loop.run(move |event, _target, control_flow| {
         *control_flow = ControlFlow::Wait;
 

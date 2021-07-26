@@ -12,12 +12,12 @@ fn build_shader_program(context: &WebGlRenderingContext) -> Result<WebGlProgram,
     let vert_shader = webgl::compile_shader(
         &context,
         WebGlRenderingContext::VERTEX_SHADER,
-        include_str!("../vertex.v.glsl"),
+        include_str!("vertex.v.glsl"),
     )?;
     let frag_shader = webgl::compile_shader(
         &context,
         WebGlRenderingContext::FRAGMENT_SHADER,
-        include_str!("../frag.f.glsl"),
+        include_str!("frag.f.glsl"),
     )?;
     let program = webgl::link_program(&context, &vert_shader, &frag_shader)?;
 
