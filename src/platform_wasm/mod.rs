@@ -51,6 +51,9 @@ fn init_keyboard(scene: Rc<RefCell<Scene>>) {
 
 #[wasm_bindgen(start)]
 pub fn start() -> Result<(), JsValue> {
+    log::set_logger(&wasm_bindgen_console_logger::DEFAULT_LOGGER).unwrap();
+    log::set_max_level(log::LevelFilter::Trace);
+
     let scene = Rc::new(RefCell::new(Scene::new()));
 
     init_keyboard(scene.clone());

@@ -57,6 +57,14 @@ impl Scene {
     }
 
     pub fn update(&mut self) {
+        log::trace!(
+            "update: up={} down={} left={} right={}",
+            self.press_up,
+            self.press_down,
+            self.press_left,
+            self.press_right
+        );
+
         const SPEED: f32 = 0.02;
         const RADIUS: f32 = 0.3;
 
