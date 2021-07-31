@@ -13,6 +13,8 @@ use glium::{
 use crate::{platform_opengl::renderer::Renderer, scene::Scene};
 
 pub fn main() -> Result<(), Box<dyn std::error::Error>> {
+    simple_logger::init_with_env()?;
+
     // nice_mode only renders a frame whenever the simulation has stepped forward. However,
     // for unknown reasons, this creates jitter. Even if a frame is always rendered per
     // simulation step.
