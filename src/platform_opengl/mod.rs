@@ -72,14 +72,14 @@ pub fn main() -> Result<(), Box<dyn std::error::Error>> {
 
             if nice_mode {
                 if ticks_ticked > 0 {
-                    println!("--------------- {}", ticks_ticked);
+                    log::trace!("--------------- {}", ticks_ticked);
                 }
 
                 if need_render {
                     let before = Instant::now();
                     renderer.render_scene(&scene);
                     let duration = Instant::now() - before;
-                    println!("{:5.5}", duration.as_micros());
+                    log::trace!("{:5.5}", duration.as_micros());
                 }
 
                 *control_flow = ControlFlow::WaitUntil(next_tick);
