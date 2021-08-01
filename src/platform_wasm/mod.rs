@@ -3,12 +3,12 @@ use wasm_bindgen::prelude::*;
 mod renderer;
 mod webgl;
 
-use crate::scene::Scene;
+use crate::{scene::Scene, TICKS_PER_SECOND};
 use std::cell::RefCell;
 use std::rc::Rc;
 use wasm_bindgen::JsCast;
 
-fn request_animation_frame(f: &Closure<dyn FnMut()>) {
+fn request_animation_frame(f: &Closure<dyn FnMut(f32)>) {
     let window = web_sys::window().unwrap();
 
     window
@@ -56,6 +56,9 @@ pub fn start() -> Result<(), JsValue> {
 
     let scene = Rc::new(RefCell::new(Scene::new()));
 
+    let tick_length_ms = 1000. / (TICKS_PER_SECOND as f32);
+    let mut prev_tick_opt = None;
+
     init_keyboard(scene.clone());
 
     let context = webgl::get_context("canvas")?;
@@ -64,11 +67,20 @@ pub fn start() -> Result<(), JsValue> {
     let f = Rc::new(RefCell::new(None));
     let g = f.clone();
 
-    *g.borrow_mut() = Some(Closure::wrap(Box::new(move || {
-        scene.borrow_mut().update();
-        renderer.render_scene(&scene.borrow()).unwrap();
+    *g.borrow_mut() = Some(Closure::wrap(Box::new(move |timestamp_ms: f32| {
+        let prev_tick = prev_tick_opt.unwrap_or(timestamp_ms);
+        let ticks = ((timestamp_ms - prev_tick) / tick_length_ms) as u32;
+        prev_tick_opt = Some(prev_tick + ticks as f32 * tick_length_ms);
+
+        log::trace!("Simulating {} tick(s)", ticks);
+        let mut scene = scene.borrow_mut();
+        for _ in 0..ticks {
+            scene.update();
+        }
+
+        renderer.render_scene(&*scene).unwrap();
         request_animation_frame(f.borrow().as_ref().unwrap());
-    }) as Box<dyn FnMut()>));
+    }) as Box<dyn FnMut(_)>));
 
     request_animation_frame(g.borrow().as_ref().unwrap());
 
