@@ -10,7 +10,8 @@ use glium::{
     },
 };
 
-use crate::{platform_opengl::renderer::Renderer, scene::Scene};
+use self::renderer::Renderer;
+use crate::{scene::Scene, TICKS_PER_SECOND};
 
 pub fn main() -> Result<(), Box<dyn std::error::Error>> {
     let mut pargs = pico_args::Arguments::from_env();
@@ -24,13 +25,19 @@ pub fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     let event_loop = glutin::event_loop::EventLoop::new();
     let window = glutin::window::WindowBuilder::new()
-        .with_inner_size(glium::glutin::dpi::LogicalSize::new(500, 500));
+        .with_inner_size(glutin::dpi::LogicalSize::new(500, 500));
     let context = glutin::ContextBuilder::new();
     let display = glium::Display::new(window, context, &event_loop)?;
 
     let mut scene = Scene::new();
 
-    let tick_length = Duration::from_micros(16667);
+    let tick_length = Duration::from_secs(1) / TICKS_PER_SECOND;
+    log::debug!(
+        "ticks_per_second={} tick_length={:?}",
+        TICKS_PER_SECOND,
+        tick_length
+    );
+
     let mut next_tick = Instant::now() + tick_length;
 
     let renderer = Renderer::new(display)?;

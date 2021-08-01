@@ -11,3 +11,5 @@ mod scene;
 mod segment;
 mod sequence;
 mod turn;
+
+pub const TICKS_PER_SECOND: u32 = 60;
