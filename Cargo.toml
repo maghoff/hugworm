@@ -36,3 +36,4 @@ features = [
 [target.'cfg(not(target_arch = "wasm32"))'.dependencies]
 glium = "0.30.1"
 simple_logger = "1.12.1"
+pico-args = "0.4.2"
