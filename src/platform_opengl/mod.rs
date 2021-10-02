@@ -13,6 +13,16 @@ use glium::{
 use self::renderer::Renderer;
 use crate::{scene::Scene, TICKS_PER_SECOND};
 
+fn handle_keyboard(scene: &mut Scene, keycode: VirtualKeyCode, value: bool) {
+    match keycode {
+        VirtualKeyCode::Up => scene.set_grow(value),
+        VirtualKeyCode::Down => scene.set_shrink(value),
+        VirtualKeyCode::Left => scene.set_turn_left(value),
+        VirtualKeyCode::Right => scene.set_turn_right(value),
+        _ => (),
+    }
+}
+
 pub fn main() -> Result<(), Box<dyn std::error::Error>> {
     simple_logger::init_with_env()?;
 
@@ -43,17 +53,19 @@ pub fn main() -> Result<(), Box<dyn std::error::Error>> {
                 WindowEvent::KeyboardInput {
                     input:
                         KeyboardInput {
-                            state: ElementState::Pressed,
+                            state,
                             virtual_keycode: Some(keycode),
                             ..
                         },
                     ..
-                } => match keycode {
-                    VirtualKeyCode::Escape => {
+                } => match (keycode, state) {
+                    (VirtualKeyCode::Escape, ElementState::Pressed) => {
                         *control_flow = ControlFlow::Exit;
                         return;
                     }
-                    _ => {}
+                    (keycode, state) => {
+                        handle_keyboard(&mut scene, *keycode, *state == ElementState::Pressed)
+                    }
                 },
                 WindowEvent::CloseRequested => {
                     *control_flow = ControlFlow::Exit;
