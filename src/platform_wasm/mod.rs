@@ -8,6 +8,11 @@ use std::cell::RefCell;
 use std::rc::Rc;
 use wasm_bindgen::JsCast;
 
+const KEY_LEFT: u32 = 37;
+const KEY_UP: u32 = 38;
+const KEY_RIGHT: u32 = 39;
+const KEY_DOWN: u32 = 40;
+
 fn request_animation_frame(f: &Closure<dyn FnMut(f32)>) {
     let window = web_sys::window().unwrap();
 
@@ -16,11 +21,33 @@ fn request_animation_frame(f: &Closure<dyn FnMut(f32)>) {
         .expect("should register `requestAnimationFrame` OK");
 }
 
+fn key_event(scene: &mut Scene, key_code: u32, depressed: bool) -> bool {
+    match key_code {
+        KEY_UP => {
+            scene.set_grow(depressed);
+            true
+        }
+        KEY_DOWN => {
+            scene.set_shrink(depressed);
+            true
+        }
+        KEY_LEFT => {
+            scene.set_turn_left(depressed);
+            true
+        }
+        KEY_RIGHT => {
+            scene.set_turn_right(depressed);
+            true
+        }
+        _ => false,
+    }
+}
+
 fn init_keyboard(scene: Rc<RefCell<Scene>>) {
     let keyup = {
         let scene = scene.clone();
         Closure::wrap(Box::new(move |event: web_sys::KeyboardEvent| {
-            let handled = scene.borrow_mut().key_event(event.key_code(), false);
+            let handled = key_event(&mut *scene.borrow_mut(), event.key_code(), false);
             if handled {
                 event.prevent_default();
             }
@@ -30,7 +57,7 @@ fn init_keyboard(scene: Rc<RefCell<Scene>>) {
     let keydown = {
         let scene = scene.clone();
         Closure::wrap(Box::new(move |event: web_sys::KeyboardEvent| {
-            let handled = scene.borrow_mut().key_event(event.key_code(), true);
+            let handled = key_event(&mut *scene.borrow_mut(), event.key_code(), true);
             if handled {
                 event.prevent_default();
             }
