@@ -610,6 +610,7 @@ dependencies = [
  "glium",
  "js-sys",
  "log",
+ "retain_mut",
  "simple_logger",
  "wasm-bindgen",
  "wasm-bindgen-console-logger",
@@ -1178,6 +1179,12 @@ checksum = "5ab49abadf3f9e1c4bc499e8845e152ad87d2ad2d30371841171169e9d75feee"
 dependencies = [
  "bitflags",
 ]
+
+[[package]]
+name = "retain_mut"
+version = "0.1.4"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "448296241d034b96c11173591deaa1302f2c17b56092106c1f92c1bc0183a8c9"
 
 [[package]]
 name = "rustc-demangle"

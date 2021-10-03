@@ -19,6 +19,7 @@ fn handle_keyboard(scene: &mut Scene, keycode: VirtualKeyCode, value: bool) {
         VirtualKeyCode::Down => scene.set_shrink(value),
         VirtualKeyCode::Left => scene.set_turn_left(value),
         VirtualKeyCode::Right => scene.set_turn_right(value),
+        VirtualKeyCode::Space => scene.set_split(value),
         _ => (),
     }
 }

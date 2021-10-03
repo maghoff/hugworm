@@ -1,9 +1,10 @@
 use crate::turn::Turn;
 use cgmath::{vec2, Vector2};
 
-const WIDTH: f32 = 0.1;
-const HALF_WIDTH: f32 = WIDTH / 2.0;
+// const WIDTH: f32 = 0.1;
+// const HALF_WIDTH: f32 = WIDTH / 2.0;
 
+#[derive(Clone)]
 pub enum Segment {
     Line {
         start: Vector2<f32>,
@@ -20,11 +21,11 @@ pub enum Segment {
 }
 
 impl Segment {
-    pub fn generate_geometry(&self, dest: &mut Vec<f32>, start_reach: f32) {
+    pub fn generate_geometry(&self, dest: &mut Vec<f32>, start_reach: f32, half_width: f32) {
         match self {
             Segment::Line { start, dir, .. } => {
                 let side = vec2(-dir.y, dir.x);
-                let left = side * HALF_WIDTH;
+                let left = side * half_width;
 
                 dest.push(start.x + left.x);
                 dest.push(start.y + left.y);
@@ -46,8 +47,8 @@ impl Segment {
                 let end_ang = start_ang + ang_dir * len / r;
 
                 let steps = 30;
-                let left_r = r - HALF_WIDTH * (*ang_dir as f32);
-                let right_r = r + HALF_WIDTH * (*ang_dir as f32);
+                let left_r = r - half_width * (*ang_dir as f32);
+                let right_r = r + half_width * (*ang_dir as f32);
                 let ang_step = (end_ang - start_ang) / steps as f32;
                 let len_step = len / steps as f32;
                 for step in 0..steps {
@@ -95,6 +96,17 @@ impl Segment {
                 let end_dir = *ang_dir * vec2(-end_norm.y, end_norm.x);
 
                 (end, end_dir)
+            }
+        }
+    }
+
+    pub fn translate(&mut self, delta: Vector2<f32>) {
+        match self {
+            Segment::Line { start, .. } => {
+                *start += delta;
+            }
+            Segment::Arc { center, .. } => {
+                *center += delta;
             }
         }
     }

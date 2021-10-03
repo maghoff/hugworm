@@ -43,30 +43,32 @@ impl Renderer {
             ..Default::default()
         };
 
-        let mut raw_vertices = vec![];
-        scene.worm.generate_geometry(&mut raw_vertices);
-
-        let vertices: Vec<_> = raw_vertices
-            .chunks_exact(4)
-            .map(|chunk| Vertex {
-                position: chunk.try_into().unwrap(),
-            })
-            .collect();
-
-        let buffer = glium::VertexBuffer::new(&self.display, &vertices).unwrap();
-
         let mut target = self.display.draw();
         target.clear_color(1.0, 1.0, 1.0, 1.0);
 
-        target
-            .draw(
-                (&buffer,),
-                glium::index::NoIndices(glium::index::PrimitiveType::TriangleStrip),
-                &self.program,
-                &uniform! {},
-                params,
-            )
-            .unwrap();
+        for worm in &scene.worms {
+            let mut raw_vertices = vec![];
+            worm.generate_geometry(&mut raw_vertices);
+
+            let vertices: Vec<_> = raw_vertices
+                .chunks_exact(4)
+                .map(|chunk| Vertex {
+                    position: chunk.try_into().unwrap(),
+                })
+                .collect();
+
+            let buffer = glium::VertexBuffer::new(&self.display, &vertices).unwrap();
+
+            target
+                .draw(
+                    (&buffer,),
+                    glium::index::NoIndices(glium::index::PrimitiveType::TriangleStrip),
+                    &self.program,
+                    &uniform! {},
+                    params,
+                )
+                .unwrap();
+        }
 
         target.finish().unwrap();
     }
